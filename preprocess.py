@@ -1,13 +1,15 @@
 import json
+from typing import List
+
 from bs4 import BeautifulSoup
 from bs4.element import Tag
-from typing import List
 
 with open("data/train_data.json", "r") as f:
     train_data = json.load(f)
 
 # The block elements we want to extract text from
 BLOCKS = ["p", "h", "h1", "h2", "h3", "h4", "h5", "li", "u", "div"]
+
 
 def _extract_blocks(parent_tag) -> List:
     """
@@ -26,11 +28,13 @@ def _extract_blocks(parent_tag) -> List:
                     extracted_blocks.extend(inner_blocks)
     return extracted_blocks
 
+
 def to_plaintext(html_text: str) -> str:
     soup = BeautifulSoup(html_text, features="lxml")
     extracted_blocks = _extract_blocks(soup.body)
     extracted_blocks_texts = [block.get_text().strip() for block in extracted_blocks]
     return "\n".join(extracted_blocks_texts)
+
 
 # Create a new json file with preprocessed text
 processed_train_data = []
