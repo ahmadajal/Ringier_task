@@ -39,15 +39,17 @@ def to_plaintext(html_text: str) -> str:
 # Create a new json file with preprocessed text
 processed_train_data = []
 for data in train_data:
-    html = data["content"]["fullTextHtml"]
-    fullText = to_plaintext(html)
-    # Copy the data point in a new dictionary
-    d = data.copy()
-    # remove the fullTextHtml key
-    d["content"].pop("fullTextHtml", None)
-    # add a new key for the processed text
-    d["content"]["fullText"] = fullText
-    processed_train_data.append(d)
+    # if there are no labels assigned, discard it!
+    if data["labels"]:
+        html = data["content"]["fullTextHtml"]
+        fullText = to_plaintext(html)
+        # Copy the data point in a new dictionary
+        d = data.copy()
+        # remove the fullTextHtml key
+        d["content"].pop("fullTextHtml", None)
+        # add a new key for the processed text
+        d["content"]["fullText"] = fullText
+        processed_train_data.append(d)
 
 with open("processed_data/processed_train_data.json", "w") as f:
     json.dump(processed_train_data, f)
