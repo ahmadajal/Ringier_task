@@ -113,7 +113,7 @@ class Training:
                 lr_scheduler.step()
                 optimizer.zero_grad()
                 progress_bar.update(1)
-            acc_epoch = self.evaluate(self.model, test_dataloader)
+            acc_epoch = self.evaluate(test_dataloader)
             logging.info(f"Validation accuracy after epoch {epoch}: {acc_epoch}")
         logging.info("Training finished!")
         acc = self.evaluate(test_dataloader)
