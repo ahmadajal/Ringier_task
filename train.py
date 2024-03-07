@@ -21,6 +21,11 @@ from preprocess import preprocess_data
 logging.basicConfig(filename="train_log.log", encoding="utf-8")
 device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
 TAXONOMY_PATH = "data/taxonomy_mappings.json"
+# Set the seed for reproducibility.
+SEED = 42
+np.random.seed(SEED)
+torch.manual_seed(SEED)
+torch.cuda.manual_seed(SEED)
 
 
 class Training:
@@ -73,6 +78,7 @@ class Training:
             range(len(tokenized_dataset)),
             test_size=0.2,
             stratify=tokenized_dataset["labels"].argmax(dim=1).numpy(),
+            random_state=SEED,
         )
         train_dataset = tokenized_dataset.select(train_inds)
         test_dataset = tokenized_dataset.select(test_inds)
