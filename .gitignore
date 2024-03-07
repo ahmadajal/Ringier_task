@@ -166,6 +166,7 @@ cython_debug/
 # Results and old files
 data/
 processed_data/
+models/
 
 
 # Exclude bash scripts
