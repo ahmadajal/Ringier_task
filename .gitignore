@@ -167,6 +167,7 @@ cython_debug/
 data/
 processed_data/
 models/
+predictions/
 
 
 # Exclude bash scripts
