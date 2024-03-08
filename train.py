@@ -45,7 +45,7 @@ class Training:
         self.batch_size = batch_size
         self.epochs = epochs
 
-    def load_datasets(self, split: bool = True) -> List[Dataset]:
+    def load_datasets(self, test: bool = False) -> List[Dataset]:
         """
         This method preprocess the raw data and convert it to Huggingface dataset. Then
         it tokenize the dataset with the proper tokenizer and converts it to torch format.
@@ -53,13 +53,16 @@ class Training:
         class labels in both datasets.
 
         Args:
-            split: If True the dataset will be splitted to training and test.
+            test: If True it indicates that we are loading a test dataset for prediction
+            and hence we do not need to do training/test splitting.
 
         Returns:
             List: train and test datasets.
         """
+        # For processing the prediction data, we need to set the test flag to True, since
+        # there are no labels in the data. We can use the split flag to do this!
         data = preprocess_data(
-            path_to_data=self.path, test=False, path_to_taxonomy_mappings=TAXONOMY_PATH
+            path_to_data=self.path, test=test, path_to_taxonomy_mappings=TAXONOMY_PATH
         )
         logging.info("Raw data preprocessing finished!")
 
@@ -76,7 +79,7 @@ class Training:
         tokenized_dataset = tokenized_dataset.remove_columns(["title"])
         # Convert the dataset to torch format
         tokenized_dataset.set_format("torch")
-        if split:
+        if not test:
             # Split the dataset to 20% test and 80% train.
             train_inds, test_inds = train_test_split(
                 range(len(tokenized_dataset)),
