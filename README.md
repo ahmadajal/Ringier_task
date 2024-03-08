@@ -1,1 +1,26 @@
 # Ringier_task
+
+Follow the instructions below to build the proper environment for this project, train the model on the training dataset,and use the trained model to make predictions on the test data (`predict_payload.json`). You should have conda package manager installed to be able to successfully run the commands below.
+
+1. Place the following files in the data folder:
+    ```
+    - train_data.json
+    - predict_payload.json
+    - taxonomy_mappings.json
+    ```
+2. In the terminal, run the following command to build the project environment.
+    ```
+    source env.sh
+    ```
+3. After running the above command, the environment of the project will be activated in your current shell. Run the command below to start training the model.
+    ```
+    python train.py
+    ```
+4. When the training is finished, a new folder called `models` will be created that contains the saved model. Now you can make predictions on the `predict_payload.json` data using the following command:
+    ```
+    python predict.py --path_to_payload data/predict_payload.json
+    ```
+    The predictions will be saved in a newly created folder called `predictions/`.
+    ```
+    predictions/probas.json
+    ```
