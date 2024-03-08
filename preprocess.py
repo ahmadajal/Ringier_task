@@ -64,12 +64,13 @@ def preprocess_data(
     """
     with open(path_to_data, "r") as f:
         data = json.load(f)
-    with open(path_to_taxonomy_mappings, "r") as f:
-        taxonomy_mappings = json.load(f)
+    if path_to_taxonomy_mappings:
+        with open(path_to_taxonomy_mappings, "r") as f:
+            taxonomy_mappings = json.load(f)
+        # Get the reverse taxonomy mappings
+        if taxonomy_mappings:
+            rev_taxonomy = {v: k for k, v in taxonomy_mappings.items()}
     processed_data = []
-    # Get the reverse taxonomy mappings
-    if taxonomy_mappings:
-        rev_taxonomy = {v: k for k, v in taxonomy_mappings.items()}
     for e in data:
         if not test:
             # for training data, if there are no labels assigned, discard it!
