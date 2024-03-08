@@ -35,22 +35,25 @@ class Training:
         """The main training class.
 
         Args:
-            path_to_train (str): _description_
-            lr (float, optional): _description_. Defaults to 5e-5.
-            batch_size (int, optional): _description_. Defaults to 16.
-            epochs (int, optional): _description_. Defaults to 3.
+            path_to_train: Path to the training data in json format.
+            lr: Learning rate. Defaults to 5e-5.
+            batch_size: Training batch size. Defaults to 16.
+            epochs: Number of epochs for training. Defaults to 3.
         """
         self.path = path_to_train
         self.lr = lr
         self.batch_size = batch_size
         self.epochs = epochs
 
-    def load_datasets(self) -> List[Dataset]:
+    def load_datasets(self, split: bool = True) -> List[Dataset]:
         """
         This method preprocess the raw data and convert it to Huggingface dataset. Then
         it tokenize the dataset with the proper tokenizer and converts it to torch format.
         Finally, it splits the data to training and test, maintining the balance of the
         class labels in both datasets.
+
+        Args:
+            split: If True the dataset will be splitted to training and test.
 
         Returns:
             List: train and test datasets.
@@ -73,16 +76,19 @@ class Training:
         tokenized_dataset = tokenized_dataset.remove_columns(["title"])
         # Convert the dataset to torch format
         tokenized_dataset.set_format("torch")
-        # Split the dataset to 20% test and 80% train.
-        train_inds, test_inds = train_test_split(
-            range(len(tokenized_dataset)),
-            test_size=0.2,
-            stratify=tokenized_dataset["labels"].argmax(dim=1).numpy(),
-            random_state=SEED,
-        )
-        train_dataset = tokenized_dataset.select(train_inds)
-        test_dataset = tokenized_dataset.select(test_inds)
-        return train_dataset, test_dataset
+        if split:
+            # Split the dataset to 20% test and 80% train.
+            train_inds, test_inds = train_test_split(
+                range(len(tokenized_dataset)),
+                test_size=0.2,
+                stratify=tokenized_dataset["labels"].argmax(dim=1).numpy(),
+                random_state=SEED,
+            )
+            train_dataset = tokenized_dataset.select(train_inds)
+            test_dataset = tokenized_dataset.select(test_inds)
+            return train_dataset, test_dataset
+        else:
+            return tokenized_dataset
 
     def train(self):
         """This method loads the train and test datasets and trains the model."""
