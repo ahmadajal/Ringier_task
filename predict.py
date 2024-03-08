@@ -28,12 +28,13 @@ def predict(predict_payload: str) -> List:
     """
     # Load the tokenized test data.
     training = Training(path_to_train=predict_payload)
-    pred_dataset = training.load_datasets(split=False)
+    pred_dataset = training.load_datasets(test=True)
     logging.info("Prediction data loaded.")
     # We need to load the data in batches, in case the prediction dataset is large!
     pred_dataloader = DataLoader(pred_dataset, batch_size=training.batch_size)
     # Load the trained model
     model = AutoModelForSequenceClassification.from_pretrained("models/bert-based-trained/")
+    model.to(device)
     model.eval()
     pred_probs = []
     for batch in pred_dataloader:
@@ -41,7 +42,7 @@ def predict(predict_payload: str) -> List:
         with torch.no_grad():
             output = model(**batch)
         probabilities = torch.nn.Softmax(dim=1)(output.logits)
-        pred_probs.extend(probabilities.cpu().numpy().tolist)
+        pred_probs.extend(probabilities.cpu().numpy().tolist())
     return pred_probs
 
 
