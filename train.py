@@ -20,7 +20,6 @@ from preprocess import preprocess_data
 logging.basicConfig(
     filename="train_log.log", filemode="w", encoding="utf-8", level=logging.INFO
 )
-device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
 TAXONOMY_PATH = "data/taxonomy_mappings.json"
 # Set the seed for reproducibility.
 SEED = 42
