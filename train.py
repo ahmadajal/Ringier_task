@@ -1,3 +1,4 @@
+import argparse
 import logging
 from typing import List
 
@@ -16,6 +17,16 @@ from transformers import (
 )
 
 from preprocess import preprocess_data
+
+argparser = argparse.ArgumentParser()
+argparser.add_argument(
+    "--model_name",
+    type=str,
+    help="model name from the huggingface model hub.",
+    default="google-bert/bert-base-cased",
+)
+argparser.add_argument("--batch_size", type=int, default=8)
+args = argparser.parse_args()
 
 logging.basicConfig(
     filename="train_log.log", filemode="w", encoding="utf-8", level=logging.INFO
@@ -53,7 +64,7 @@ def load_datasets(path: str, test: bool = False) -> List[Dataset]:
     # Create Huggingface dataset
     dataset = Dataset.from_pandas(pd.DataFrame(data))
     # Tokenize the dataset for the model.
-    tokenizer = AutoTokenizer.from_pretrained("google-bert/bert-base-cased")
+    tokenizer = AutoTokenizer.from_pretrained(args.model_name)
     tokenized_dataset = dataset.map(
         lambda x: tokenizer(x["fullText"], padding="max_length", truncation=True),
         batched=True,
@@ -85,15 +96,13 @@ def train(path: str):
         path: Path to the training dataset json file.
     """
     X_train, X_test = load_datasets(path)
-    # # Temp: to reduce the data size for trying...
-    # X_train = X_train.select(range(1000))
     logging.info("Training and Test data loaded.")
     num_labels = len(X_train[0]["labels"])
     model = AutoModelForSequenceClassification.from_pretrained(
-        "google-bert/bert-base-cased", num_labels=num_labels
+        args.model_name, num_labels=num_labels
     )
     training_args = TrainingArguments(
-        "models/bert-cased-trainer",
+        f"models/{args.model_name.split('/')[-1]}",
         overwrite_output_dir=True,
         evaluation_strategy="epoch",
         metric_for_best_model="eval_loss",
@@ -101,6 +110,8 @@ def train(path: str):
         load_best_model_at_end=True,
         save_total_limit=5,
         num_train_epochs=5,
+        per_gpu_train_batch_size=args.batch_size,
+        per_gpu_eval_batch_size=args.batch_size,
     )
     trainer = Trainer(
         model=model,
