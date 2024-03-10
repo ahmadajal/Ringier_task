@@ -3,7 +3,7 @@ import json
 import os
 from typing import List
 
-from scipy.special import softmax
+from scipy.special import expit
 from transformers import AutoModelForSequenceClassification, Trainer
 
 from train import load_datasets
@@ -31,7 +31,8 @@ def predict(predict_payload: str, model_name: str) -> List:
     )
     trainer = Trainer(model)
     output = trainer.predict(pred_dataset)
-    pred_probs = softmax(output.predictions, axis=1)
+    # Apply Sigmoid to get the confidence for each class label.
+    pred_probs = expit(output.predictions)
     return pred_probs.tolist()
 
 
