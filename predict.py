@@ -23,6 +23,7 @@ def predict(predict_payload: str, model_name: str) -> List:
     pred_dataset = load_datasets(path=predict_payload, model_name=model_name, test=True)
     # Load the trained model
     ckpt_dirs = os.listdir(f"models/{model_name.split('/')[-1]}")
+    ckpt_dirs = [x for x in ckpt_dirs if x.startswith("checkpoint")]
     # As we loaded the best model in the end of training, the last checkpoint
     # is the best one.
     last_ckpt = sorted(ckpt_dirs, key=lambda x: int(x.split("-")[1]))[-1]
