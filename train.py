@@ -1,6 +1,5 @@
 import argparse
 import logging
-from typing import List
 
 import numpy as np
 import pandas as pd
@@ -29,7 +28,7 @@ torch.manual_seed(SEED)
 torch.cuda.manual_seed(SEED)
 
 
-def load_datasets(path: str, test: bool = False) -> List[Dataset]:
+def load_datasets(path: str, model_name: str, test: bool = False) -> Dataset:
     """
     This function preprocesses the raw data and converts it to Huggingface dataset. Then
     it tokenize the dataset with the proper tokenizer and converts it to torch format.
@@ -38,8 +37,9 @@ def load_datasets(path: str, test: bool = False) -> List[Dataset]:
 
     Args:
         path: Path to the training dataset json file.
+        model_name: Name of the model from huggingface model hub.
         test: If True it indicates that we are loading a test dataset for prediction
-        and hence we do not need to do training/test splitting.
+        and hence we do not need to do training/test splitting. Defaults to False.
 
     Returns:
         List: train and test datasets.
@@ -54,7 +54,7 @@ def load_datasets(path: str, test: bool = False) -> List[Dataset]:
     # Create Huggingface dataset
     dataset = Dataset.from_pandas(pd.DataFrame(data))
     # Tokenize the dataset for the model.
-    tokenizer = AutoTokenizer.from_pretrained(args.model_name)
+    tokenizer = AutoTokenizer.from_pretrained(model_name)
     tokenized_dataset = dataset.map(
         lambda x: tokenizer(x["fullText"], padding="max_length", truncation=True),
         batched=True,
@@ -79,20 +79,22 @@ def load_datasets(path: str, test: bool = False) -> List[Dataset]:
         return tokenized_dataset
 
 
-def train(path: str):
+def train(path: str, model_name: str, batch_size: int) -> None:
     """This method loads the train and test datasets and trains the model.
 
     Args:
         path: Path to the training dataset json file.
+        model_name: Name of the model from huggingface model hub.
+        batch_size: Batch size for training and evaluation.
     """
     X_train, X_test = load_datasets(path)
     logging.info("Training and Test data loaded.")
     num_labels = len(X_train[0]["labels"])
     model = AutoModelForSequenceClassification.from_pretrained(
-        args.model_name, num_labels=num_labels
+        model_name, num_labels=num_labels
     )
     training_args = TrainingArguments(
-        f"models/{args.model_name.split('/')[-1]}",
+        f"models/{model_name.split('/')[-1]}",
         overwrite_output_dir=True,
         evaluation_strategy="epoch",
         metric_for_best_model="eval_loss",
@@ -100,8 +102,8 @@ def train(path: str):
         load_best_model_at_end=True,
         save_total_limit=5,
         num_train_epochs=5,
-        per_device_train_batch_size=args.batch_size,
-        per_device_eval_batch_size=args.batch_size,
+        per_device_train_batch_size=batch_size,
+        per_device_eval_batch_size=batch_size,
     )
     trainer = Trainer(
         model=model,
@@ -150,4 +152,4 @@ if __name__ == "__main__":
     )
     argparser.add_argument("--batch_size", type=int, default=8)
     args = argparser.parse_args()
-    train(path="data/train_data.json")
+    train(path="data/train_data.json", model_name=args.model_name)
