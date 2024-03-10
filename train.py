@@ -100,8 +100,8 @@ def train(path: str):
         load_best_model_at_end=True,
         save_total_limit=5,
         num_train_epochs=5,
-        per_gpu_train_batch_size=args.batch_size,
-        per_gpu_eval_batch_size=args.batch_size,
+        per_device_train_batch_size=args.batch_size,
+        per_device_eval_batch_size=args.batch_size,
     )
     trainer = Trainer(
         model=model,
