@@ -8,16 +8,6 @@ from transformers import AutoModelForSequenceClassification, Trainer
 
 from train import load_datasets
 
-argparser = argparse.ArgumentParser()
-argparser.add_argument("--path_to_payload", type=str, help="path to predict_payload.json")
-argparser.add_argument(
-    "--model_name",
-    type=str,
-    help="model name from the huggingface model hub.",
-    default="google-bert/bert-base-cased",
-)
-args = argparser.parse_args()
-
 
 def predict(predict_payload: str, model_name: str) -> List:
     """This function computes the class probabilities for the test data.
@@ -46,6 +36,15 @@ def predict(predict_payload: str, model_name: str) -> List:
 
 
 if __name__ == "__main__":
+    argparser = argparse.ArgumentParser()
+    argparser.add_argument("--path_to_payload", type=str, help="path to predict_payload.json")
+    argparser.add_argument(
+        "--model_name",
+        type=str,
+        help="model name from the huggingface model hub.",
+        default="google-bert/bert-base-cased",
+    )
+    args = argparser.parse_args()
     pred_probs = predict(args.path_to_payload, args.model_name)
     # Save the predictions.
     os.makedirs("predictions/", exist_ok=True)
