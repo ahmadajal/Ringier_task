@@ -20,7 +20,7 @@ def predict(predict_payload: str, model_name: str) -> List:
         A list of lists of class probabilities.
     """
     # Load the tokenized test data.
-    pred_dataset = load_datasets(path=predict_payload, test=True)
+    pred_dataset = load_datasets(path=predict_payload, model_name=model_name, test=True)
     # Load the trained model
     ckpt_dirs = os.listdir(f"models/{model_name.split('/')[-1]}")
     # As we loaded the best model in the end of training, the last checkpoint
