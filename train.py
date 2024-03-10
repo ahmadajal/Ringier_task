@@ -87,8 +87,11 @@ def train(path: str, model_name: str, batch_size: int) -> None:
     X_train, X_test = load_datasets(path)
     logging.info("Training and Test data loaded.")
     num_labels = len(X_train[0]["labels"])
+    # Since we have multiple labels per training data, we set the problem type
+    # to mulit-label. In this case, binary cross entropy loss will be used to
+    # compute the loss for each label.
     model = AutoModelForSequenceClassification.from_pretrained(
-        model_name, num_labels=num_labels
+        model_name, num_labels=num_labels, problem_type="multi_label_classification"
     )
     training_args = TrainingArguments(
         f"models/{model_name.split('/')[-1]}",
