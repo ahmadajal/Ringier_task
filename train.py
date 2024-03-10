@@ -17,9 +17,6 @@ from transformers import (
 
 from preprocess import preprocess_data
 
-logging.basicConfig(
-    filename="train_log.log", filemode="w", encoding="utf-8", level=logging.INFO
-)
 TAXONOMY_PATH = "data/taxonomy_mappings.json"
 # Set the seed for reproducibility.
 SEED = 42
@@ -152,4 +149,7 @@ if __name__ == "__main__":
     )
     argparser.add_argument("--batch_size", type=int, default=8)
     args = argparser.parse_args()
+    logging.basicConfig(
+        filename="train_log.log", filemode="w", encoding="utf-8", level=logging.INFO
+    )
     train(path="data/train_data.json", model_name=args.model_name)
