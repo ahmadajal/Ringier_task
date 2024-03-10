@@ -155,4 +155,4 @@ if __name__ == "__main__":
     logging.basicConfig(
         filename="train_log.log", filemode="w", encoding="utf-8", level=logging.INFO
     )
-    train(path="data/train_data.json", model_name=args.model_name)
+    train(path="data/train_data.json", model_name=args.model_name, batch_size=args.batch_size)
