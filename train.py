@@ -18,16 +18,6 @@ from transformers import (
 
 from preprocess import preprocess_data
 
-argparser = argparse.ArgumentParser()
-argparser.add_argument(
-    "--model_name",
-    type=str,
-    help="model name from the huggingface model hub.",
-    default="google-bert/bert-base-cased",
-)
-argparser.add_argument("--batch_size", type=int, default=8)
-args = argparser.parse_args()
-
 logging.basicConfig(
     filename="train_log.log", filemode="w", encoding="utf-8", level=logging.INFO
 )
@@ -151,4 +141,13 @@ def compute_metrics(eval_pred):
 
 
 if __name__ == "__main__":
+    argparser = argparse.ArgumentParser()
+    argparser.add_argument(
+        "--model_name",
+        type=str,
+        help="model name from the huggingface model hub.",
+        default="google-bert/bert-base-cased",
+    )
+    argparser.add_argument("--batch_size", type=int, default=8)
+    args = argparser.parse_args()
     train(path="data/train_data.json")
