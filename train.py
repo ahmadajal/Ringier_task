@@ -5,8 +5,10 @@ import numpy as np
 import pandas as pd
 import torch
 from datasets import Dataset
+from scipy.special import expit
 from sklearn.metrics import accuracy_score, precision_score, recall_score
 from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import MultiLabelBinarizer
 from transformers import (
     AutoModelForSequenceClassification,
     AutoTokenizer,
@@ -130,14 +132,26 @@ def train(path: str, model_name: str, batch_size: int) -> None:
 
 def compute_metrics(eval_pred):
     logits, labels = eval_pred
-    preds = logits.argmax(-1)
-    # Use the label with the highest confidence for computing the metrics.
-    top_labels = labels.argmax(-1)
+    # Apply Sigmoid to get the confidence for each class label.
+    preds = expit(logits)
+    num_classes = labels.shape[-1]
+    # Use the labels with confidence>0.5 as correct labels.
+    labels = [
+        np.arange(labels.shape[-1])[labels[i] > 0.5].tolist() for i in range(labels.shape[0])
+    ]
+    # Same for the predictions
+    preds = [
+        np.arange(preds.shape[-1])[preds[i] > 0.5].tolist() for i in range(preds.shape[0])
+    ]
+    # Convert labels and predictions to multi-label format.
+    mlb = MultiLabelBinarizer(classes=range(num_classes))
+    labels = mlb.fit_transform(labels)
+    preds = mlb.fit_transform(preds)
 
     # Calculate the metrics.
-    accuracy = accuracy_score(top_labels, preds)
-    precision = precision_score(top_labels, preds, average="weighted")
-    recall = recall_score(top_labels, preds, average="weighted")
+    accuracy = accuracy_score(labels, preds)
+    precision = precision_score(labels, preds, average="weighted")
+    recall = recall_score(labels, preds, average="weighted")
 
     return {"accuracy": accuracy, "precision": precision, "recall": recall}
 
