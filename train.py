@@ -84,7 +84,7 @@ def train(path: str, model_name: str, batch_size: int) -> None:
         model_name: Name of the model from huggingface model hub.
         batch_size: Batch size for training and evaluation.
     """
-    X_train, X_test = load_datasets(path)
+    X_train, X_test = load_datasets(path, model_name)
     logging.info("Training and Test data loaded.")
     num_labels = len(X_train[0]["labels"])
     # Since we have multiple labels per training data, we set the problem type
