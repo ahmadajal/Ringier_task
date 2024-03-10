@@ -81,12 +81,11 @@ def preprocess_data(
                 d["title"] = e["content"]["title"]
                 # add a new key for the processed text
                 d["fullText"] = fullText
-                # Substitute the 'labels' with a vector of probability for all labels.
+                # Substitute the 'labels' with a vector of confidences for all labels.
                 # Labels are ordered according to the taxonomy mapping.
                 all_labels_probs = [0] * len(rev_taxonomy)
-                sum_confidence = sum([l_[1] for l_ in e["labels"]])
                 for l_ in e["labels"]:
-                    all_labels_probs[int(rev_taxonomy[l_[0]])] = l_[1] / sum_confidence
+                    all_labels_probs[int(rev_taxonomy[l_[0]])] = l_[1]
                 d["labels"] = all_labels_probs
                 processed_data.append(d)
         else:
