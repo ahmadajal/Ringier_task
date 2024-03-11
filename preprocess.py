@@ -34,7 +34,7 @@ def _extract_blocks(parent_tag: str) -> List:
 
 
 def to_plaintext(html_text: str) -> str:
-    """This dunction extract the texts from all block elements inside the
+    """This function extract the texts from all block elements inside the
     HTML body, strips them of left and right whtie spaces and joins them
     together with a single new line.
 
