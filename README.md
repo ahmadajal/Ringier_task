@@ -24,3 +24,16 @@ Follow the instructions below to build the proper environment for this project, 
     ```
     predictions/probas.json
     ```
+5. You can also use the following API deployed on the Internet to test the solution. To do so, run the following lines in Python. For this part, you will not need the environment of the project necessarily. Any python environment with `requests` and `json` packages installed should work. You just need to substitute the placeholder `<PATH-TO-predict_payload.json>` with the appropriate path on your computer.
+    ```
+    import requests
+    import json
+    headers = {'Content-Type': 'application/json', 'Accept':'application/json'}
+
+    payload = {
+        "data": json.load(open("<PATH-TO-predict_payload.json>", "r"))
+    }
+    response = requests.post("https://ringier-c45baz7vfq-oa.a.run.app", json=payload, headers=headers)
+    # The predicted probabilities for each class:
+    print(response.json())
+    ```
