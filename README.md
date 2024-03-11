@@ -37,3 +37,5 @@ Follow the instructions below to build the proper environment for this project, 
     # The predicted probabilities for each class:
     print(response.json())
     ```
+6. You can also play with the following UI to test the solution:
+    https://ringier-streamlit-c45baz7vfq-oa.a.run.app/
